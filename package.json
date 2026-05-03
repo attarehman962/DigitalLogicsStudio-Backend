@@ -1,0 +1,36 @@
+{
+  "name": "digitallogicsstudio-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Digital Logics Studio",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "mern",
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "mongoose": "^8.23.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QuantumLogicsLabs/DigitalLogicsStudio-Backend.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/QuantumLogicsLabs/DigitalLogicsStudio-Backend/issues"
+  },
+  "homepage": "https://github.com/QuantumLogicsLabs/DigitalLogicsStudio-Backend#readme"
+}

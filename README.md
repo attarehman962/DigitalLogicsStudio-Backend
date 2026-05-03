@@ -1,1 +1,3 @@
-# DIGITAL LOGICS STUDIO - Backend
+# DigitalLogicsStudio Backend
+
+Basic MERN backend scaffold with Express, Mongoose, and MongoDB Atlas support.
