@@ -12,8 +12,8 @@ function getCookieOptions() {
 
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction, // true in production (HTTPS only)
+    sameSite: isProduction ? "none" : "lax", // "none" required for cross-origin cookies
     maxAge: cookieExpiresDays * 24 * 60 * 60 * 1000,
   };
 }
@@ -21,11 +21,9 @@ function getCookieOptions() {
 function generateToken(userId) {
   assertAuthConfig();
 
-  return jwt.sign(
-    { userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
-  );
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+  });
 }
 
 function setAuthCookie(res, token) {

@@ -11,20 +11,31 @@ const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 dotenv.config();
 
 const app = express();
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
-const normalizedClientUrl = clientUrl.replace(/\/$/, "");
+
+// Allow both local dev and production frontend origins
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://circuits.quantumlogicslimited.com",
+];
 
 app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://circuits.quantumlogicslimited.com",
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy blocked origin: ${origin}`));
+      }
+    },
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -40,14 +51,11 @@ if (process.env.NODE_ENV !== "production") {
     swaggerUi.setup(swaggerSpec, {
       customSiteTitle: "Digital Logics Studio — API Docs",
       swaggerOptions: {
-        // Cookies are sent automatically when Swagger UI and API share the same origin.
-        // Login via POST /api/auth/login first, then protected routes will work.
         withCredentials: true,
       },
     }),
   );
 
-  // Expose raw OpenAPI JSON for external tools (Postman, Insomnia, etc.)
   app.get("/api/docs.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.send(swaggerSpec);
