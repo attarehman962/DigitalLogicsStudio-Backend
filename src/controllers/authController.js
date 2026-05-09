@@ -11,6 +11,7 @@ function sanitizeUser(user) {
     id: user._id,
     name: user.name,
     email: user.email,
+    solvedProblems: user.solvedProblems || [],
     createdAt: user.createdAt,
   };
 }
