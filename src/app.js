@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
+const progressRoutes = require("./routes/progressRoutes");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/progress", progressRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
