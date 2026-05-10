@@ -19,7 +19,7 @@ const validateEnvironment = () => {
 };
 
 if (process.env.NODE_ENV !== "production") {
-  // Local development: start the server normally
+  // Local development: start the HTTP server normally
   const startServer = async () => {
     try {
       validateEnvironment();
@@ -35,12 +35,40 @@ if (process.env.NODE_ENV !== "production") {
 
   startServer();
 } else {
-  // Vercel serverless: just connect DB (no app.listen)
+  // ── Vercel serverless ────────────────────────────────────────────────────
+  // FIX 3: In the original code the production branch called connectDB() but
+  //         did NOT await it synchronously before exporting `app`.  On a cold
+  //         start Vercel could receive the first request before Mongoose was
+  //         connected, causing "MongoNotConnectedError" on every route.
+  //
+  //         The correct pattern is to connect lazily inside a wrapper that
+  //         reuses an existing connection (Mongoose caches the connection on
+  //         the module level) rather than calling connectDB() at the top level
+  //         and hoping it resolves in time.
+  //
+  //         We export a thin async handler that ensures the DB is ready before
+  //         passing the request to Express.
+
   validateEnvironment();
-  connectDB().catch((err) => {
-    console.error("MongoDB connection failed:", err.message);
-  });
+
+  let dbConnected = false;
+
+  const handler = async (req, res) => {
+    if (!dbConnected) {
+      await connectDB();
+      dbConnected = true;
+    }
+    // Delegate to the Express app
+    app(req, res);
+  };
+
+  // Vercel expects module.exports to be the request handler
+  module.exports = handler;
+
+  // Early-exit so the module.exports below is NOT reached in production
+  return; // eslint-disable-line no-unreachable
 }
 
 // Required for Vercel — export the app as the handler
+// (Only reached in development; the production branch returns early above.)
 module.exports = app;
